@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --color --inline --progress --config ./build/webpack.dev.js",
     "build": "NODE_ENV=production webpack --progress --config ./build/webpack.prod.js",
-    "build:report": "NODE_ENV=production webpack --progress --config ./build/webpack.prod.js"
+    "build:report": "NODE_ENV=production webpack --progress --config ./build/webpack.prod.js",
+    "precommit": "npm run lint",
+    "lint": "eslint src/**/*.js build/**/*.js"
   },
   "author": "kungfu",
   "license": "ISC",
@@ -24,8 +26,11 @@
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
     "css-loader": "^3.4.2",
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.19.0",
     "happypack": "^5.0.1",
     "html-webpack-plugin": "^3.2.0",
+    "husky": "^4.2.3",
     "less": "^3.11.1",
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.9.0",

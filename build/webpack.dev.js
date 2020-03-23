@@ -18,4 +18,4 @@ module.exports = merge(commonConfig, {
         new webpack.HotModuleReplacementPlugin()
     ],
     devtool: 'eval-source-map'
-})
+});

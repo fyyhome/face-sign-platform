@@ -1,7 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HappyPack = require("happypack");
+const HappyPack = require('happypack');
 const os = require('os');
 
 const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
@@ -76,4 +76,4 @@ module.exports = {
             src: '../src'
         }
     }
-}
+};
