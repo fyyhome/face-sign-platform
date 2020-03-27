@@ -73,7 +73,7 @@ module.exports = {
     ],
     resolve: {
         alias: {
-            src: '../src'
+            src: srcDir
         }
     }
 };

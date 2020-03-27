@@ -24,7 +24,8 @@ module.exports = {
         "eslint-plugin-react"
     ],
     "rules": {
-        quotes: ["error", "single", { "allowTemplateLiterals": true }],
-        semi: ["error", "always"]
+        "quotes": ["error", "single", { "allowTemplateLiterals": true }],
+        "semi": ["error", "always"],
+        "react/prop-types": 0
     }
 };
