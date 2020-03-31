@@ -4,7 +4,7 @@ import {
     KeyOutlined
 } from '@ant-design/icons';
 import Login from 'src/pages/Login';
-import Home from 'src/pages/Home';
+import Index from 'src/pages/Index';
 
 const routers = [
     {
@@ -21,16 +21,16 @@ const routers = [
         key: 'home',
         isShow: false,
         auth: true,
-        component: Home,
+        component: null,
         routers: [
             {
-                path: '/index',
+                path: '/',
                 title: '首页',
                 icon: HomeOutlined,
                 key: 'index',
                 isShow: true,
                 auth: true,
-                component: null
+                component: Index
             },
             {
                 path: '/user',

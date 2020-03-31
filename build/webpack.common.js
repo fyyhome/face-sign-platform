@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HappyPack = require('happypack');
 const os = require('os');
 
@@ -69,7 +70,10 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             template: `${srcDir}/index.html`
-        })
+        }),
+        new CopyWebpackPlugin([
+            {from: `${srcDir}/assets/models`, to: 'models'}
+        ])
     ],
     resolve: {
         alias: {

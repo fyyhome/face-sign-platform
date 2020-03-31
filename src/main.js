@@ -3,29 +3,30 @@ import ReactDom from 'react-dom';
 import routers from 'src/routers';
 import { isLogin } from 'src/services/permission';
 import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import AuthRoute from 'src/utils/authRoute';
+import AuthRoute from 'src/components/AuthRoute';
+import BasicLayout from 'src/layout/BasicLayout';
+
+const homeRouter = routers.find(router => router.path === '/');
+const loginRouter = routers.find(router => router.path === '/login');
 
 function App() {
     return (
         <Router>
             <Switch>
-                {
-                    routers.map((router, index) => router.component ? router.auth ? (
-                        <AuthRoute key={index} routers={routers} beforeEnter={() => {
+                <Route path={loginRouter.path}>
+                    <loginRouter.component />
+                </Route>
+                <BasicLayout routers={homeRouter.routers}>
+                    <Switch>
+                        <AuthRoute routers={homeRouter.routers} beforeEnter={() => {
                             return isLogin() ? true : () => {
                                 return (
                                     <Redirect to="/login" />
                                 );
                             };
                         }} />
-                    ) : (
-                        <Route path={router.path} key={index}>
-                            {React.createElement(router.component, {
-                                router: router
-                            })}
-                        </Route>
-                    ) : null)
-                }
+                    </Switch>
+                </BasicLayout>
             </Switch>
         </Router>
     );

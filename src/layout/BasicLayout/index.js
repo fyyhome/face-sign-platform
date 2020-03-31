@@ -20,6 +20,7 @@ export default function BaseLayout({children, routers}) {
                 </div>
                 <MenuList
                     routers={routers}
+                    defaultSelectedKeys={routers[0].key}
                 ></MenuList>
             </Sider>
             <Layout>
