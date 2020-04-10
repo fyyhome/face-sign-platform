@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 
 
@@ -37,6 +37,21 @@ const deepFind = (routers, callback) => {
  */
 
 export default function({routers, beforeEnter, location}) {
+    const [authStatus, setAuthStatus] = useState(false);
+    useEffect(() => {
+        const hookResult = beforeEnter && typeof beforeEnter === 'function' && beforeEnter();
+
+        if (hookResult instanceof Promise) {
+            hookResult.then(res => {
+                // warn: 这里hooks有个坑，如果传入函数作为参数，会执行 fn(state)
+                setAuthStatus(() => res);
+            });
+        } else {
+            setAuthStatus(hookResult);
+        }
+    }, []);
+
+    
     const { pathname } = location;
     console.log(pathname, 'pathname');
     const targetRouter = deepFind(routers, router => router.path === pathname);
@@ -44,8 +59,6 @@ export default function({routers, beforeEnter, location}) {
         return null;
     }
     const { auth, component, path } = targetRouter;
-
-    const authStatus = beforeEnter && typeof beforeEnter === 'function' && beforeEnter();
 
     const renderRoute = () => component ? (
         <Route path={path}>

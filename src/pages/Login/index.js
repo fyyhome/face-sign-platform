@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Form, Input, Button } from 'antd';
-import { mockLogin, resetLogin } from 'src/services/permission';
+import { Redirect } from 'react-router-dom';
+import request from 'src/utils/request';
 import './style.less';
 
 export default function LoginPage() {
     const [isRegister, setIsRegister] = useState(false);
+    const [isLogin, setIsLogin] = useState(false);
     const [form] = Form.useForm();
 
     const onToggle = e => {
@@ -13,14 +15,24 @@ export default function LoginPage() {
     };
     const onReset = () => {
         form.resetFields();
-        resetLogin();
     };
-    const onLogin = () => {
-        // TODO
-        mockLogin();
+    const onFinsh = values => {
+        const apiUrl = isRegister ? '/api/register' : '/api/login';
+        request.post(apiUrl, {
+            ...values
+        }).then(res => {
+            if (res.data.code === 200) {
+                if (!isRegister) {
+                    localStorage.setItem('token', res.data.data);
+                    setIsLogin(true);
+                } else {
+                    setIsRegister(false);
+                }
+            }
+        });
     };
 
-    return (
+    return isLogin ? (<Redirect to="/" />) : (
         <div className="login-page">
             <div className="form-wrap">
                 <Form
@@ -31,6 +43,7 @@ export default function LoginPage() {
                         span: 8
                     }}
                     form={form}
+                    onFinish={onFinsh}
                 >
                     <Form.Item
                         label="账号"
@@ -60,7 +73,7 @@ export default function LoginPage() {
                         isRegister
                         ? (<Form.Item
                             label="手机号"
-                            name="phoneNumber"
+                            name="phone"
                         >
                             <Input type="number" />
                         </Form.Item>)
@@ -73,8 +86,8 @@ export default function LoginPage() {
                             span: 16
                         }}
                     >
-                        <Button type="primary" htmlType="submit" onClick={onLogin}>
-                            登录
+                        <Button type="primary" htmlType="submit">
+                            {isRegister ? '注册' : '登录'}
                         </Button>
                         <Button htmlType="button" onClick={onReset}>
                             重置

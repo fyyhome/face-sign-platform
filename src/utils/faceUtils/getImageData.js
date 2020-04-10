@@ -43,3 +43,10 @@ export default function getImageData(imageSource) {
         }
     });
 }
+
+export const clipImage = (img, faceDetectionBox) => {
+    const { x, y, width, height } = faceDetectionBox;
+    const ctx = initCanvas().getContext('2d');
+    ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+    return ctx.getImageData(0, 0, width, height);
+};

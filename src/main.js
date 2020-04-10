@@ -19,11 +19,20 @@ function App() {
                 <BasicLayout routers={homeRouter.routers}>
                     <Switch>
                         <AuthRoute routers={homeRouter.routers} beforeEnter={() => {
-                            return isLogin() ? true : () => {
-                                return (
-                                    <Redirect to="/login" />
-                                );
-                            };
+                            // 优化点：请求未返回前，会跳转到主页，渲染null。应该在请求没有验证通过前无法跳转到主页
+                            return new Promise((resolve) => {
+                                isLogin().then(res => {
+                                    res ? resolve(true) : resolve(() => {
+                                        return (
+                                            <Redirect to="/login" />
+                                        );
+                                    });
+                                }).catch(() => resolve(() => {
+                                    return (
+                                        <Redirect to="/login" />
+                                    );
+                                }));
+                            });
                         }} />
                     </Switch>
                 </BasicLayout>

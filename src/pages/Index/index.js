@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import Webcamera from 'src/components/WebCamera';
-import { initCanvas } from 'src/utils/faceUtils/getImageData';
+import { clipImage } from 'src/utils/faceUtils/getImageData';
 import faceapi, { getDetectorOptions, isModelLoaded, loadModel } from 'src/utils/faceUtils/faceDetectionControl';
+import {grayPocess} from 'src/utils/faceUtils/grayProcess';
+import histogramEqualize from 'src/utils/faceUtils/histogramEqualize';
+import request from 'src/utils/request';
 import './style.less';
 import { Form, Select, Button, Input, Row, Col } from 'antd';
 
@@ -27,11 +30,25 @@ const removeOverlay = () => {
     }
 };
 
-const clipImage = (videoEl, faceDetectionBox) => {
-    const { x, y, width, height } = faceDetectionBox;
-    const ctx = initCanvas().getContext('2d');
-    ctx.drawImage(videoEl, x, y, width, height, 0, 0, width, height);
-    return ctx.getImageData(0, 0, width, height);
+const scaleImage = imageData => {
+    return new Promise((resolve, reject) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        ctx.putImageData(imageData, 0, 0);
+        const imgUrl = canvas.toDataURL('image/png');
+        const image = new Image();
+        image.onload = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(image, 0, 0, 30, 30);
+            resolve(ctx.getImageData(0, 0, 30, 30));
+        };
+        image.src = imgUrl;
+        image.onerror = e => {
+            reject(e);
+        };
+    });
 };
 
 const onPlayMark = async () => {
@@ -47,10 +64,17 @@ const onPlayMark = async () => {
         const box = result.box;
         const imageScreenShot = clipImage(webCameraRef.current, box);
         // TODO
-        console.log(imageScreenShot, '处理图像信息');
+        const faceImageData = await scaleImage(imageScreenShot);
+        const faceData = histogramEqualize(grayPocess(faceImageData).grayMatrix);
+        request.post('/api/detect', {
+            faceData,
+        }).then(res => {
+            console.log(res, 'detect');
+        });
 
         const dims = faceapi.matchDimensions(canvas, webCameraRef.current, true);
         faceapi.draw.drawDetections(canvas, faceapi.resizeResults(result, dims));
+        webCameraRef.current.pause();
     }
 
     setTimeout(() => onPlayMark());
@@ -63,22 +87,29 @@ export default function IndexPage() {
         if (isUsingCamera) {
             appendOverlay();
             loadModel();
-            return () => removeOverlay();
+            webCameraRef.current && webCameraRef.current.paused
+                ? webCameraRef.current.play() : void 0;
+            
         }
+        return () => {
+            webCameraRef.current && webCameraRef.current.pause();
+            removeOverlay();
+        };
     });
 
     return (
         <div className='index-page'>
             <div className="form-wrap">
-                <Form>
+                <Form
+                    onChange={(value) => {
+                        console.log(value);
+                    }}
+                >
                     <Row>
                         <Col span={9} offset={2}>
-                            <Form.Item name="detectionClass" label="选择班级">
+                            <Form.Item name="detectionclass" label="选择班级">
                                 <Select
                                     allowClear
-                                    onChange={(value) => {
-                                        console.log(value);
-                                    }}
                                 >
                                     <Select.Option value="computer162">计算机162班</Select.Option>
                                     <Select.Option value="computer163">计算机163班</Select.Option>
@@ -86,7 +117,7 @@ export default function IndexPage() {
                             </Form.Item>
                         </Col>
                         <Col span={9} offset={2}>
-                            <Form.Item name="signName" label="签到场次">
+                            <Form.Item name="activename" label="签到场次">
                                 <Input />
                             </Form.Item>
                         </Col>

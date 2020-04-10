@@ -5,6 +5,7 @@ import {
 } from '@ant-design/icons';
 import Login from 'src/pages/Login';
 import Index from 'src/pages/Index';
+import DataEntry from 'src/pages/DataEntry';
 
 const routers = [
     {
@@ -25,12 +26,21 @@ const routers = [
         routers: [
             {
                 path: '/',
-                title: '首页',
+                title: '签到管理',
                 icon: HomeOutlined,
                 key: 'index',
                 isShow: true,
                 auth: true,
                 component: Index
+            },
+            {
+                path: '/data-entry',
+                title: '照片录入',
+                icon: UserOutlined,
+                key: 'data-entry',
+                isShow: true,
+                auth: true,
+                component: DataEntry,
             },
             {
                 path: '/user',
